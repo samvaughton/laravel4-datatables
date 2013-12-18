@@ -15,7 +15,10 @@ Then run `composer update`.
 #### Simple Example
 
 ```php
-$customers = \Customer::select('id', 'name', 'email_address AS email', 'phone_mobile AS phone', 'date_registered');
+$customers = \Customer::select(
+    'id', 'name', 'email_address AS email',
+    'phone_mobile AS phone', 'date_registered'
+);
 
 $dth = new DataTable(\Input::all(), $customers, array(
     new Column('id'),
