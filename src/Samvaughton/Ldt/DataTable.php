@@ -251,7 +251,7 @@ class DataTable
 
             if ($column->isDynamic()) {
                 $this->query->orderBy(
-                    $column->getName(),
+                    $column->getSqlColumn(),
                     $direction
                 );
             }
