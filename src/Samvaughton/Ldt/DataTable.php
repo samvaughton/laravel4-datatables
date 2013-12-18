@@ -249,12 +249,7 @@ class DataTable
             $direction = $this->getParam("sSortDir_{$colNum}", "asc");
             $column = $this->columns[$this->getParam("iSortCol_{$colNum}", 0)];
 
-            if ($column->isDynamic()) {
-                $this->query->orderBy(
-                    $column->getSqlColumn(),
-                    $direction
-                );
-            }
+            if ($column->isDynamic()) $this->query->orderBy($column->getSqlColumn(), $direction);
         }
     }
 
