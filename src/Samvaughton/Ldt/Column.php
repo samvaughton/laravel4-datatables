@@ -48,14 +48,29 @@ class Column
      * @param $originalRow
      * @return mixed
      */
-    public function render($currentValue, $row, $originalRow)
+    public function process($currentValue, $row, $originalRow)
     {
-        if ($this->hasRenderCallback()) {
-            $callback = $this->options['render'];
+        if ($this->canProcess()) {
+            $callback = $this->options['process'];
+
+            if ($callback instanceof ColumnProcessorInterface) {
+                return $callback->run($currentValue, $row, $originalRow);
+            }
+
             return $callback($currentValue, $row, $originalRow);
         }
 
         return $currentValue;
+    }
+
+    /**
+     * Returns whether this column has a callback or not.
+     *
+     * @return bool
+     */
+    public function canProcess()
+    {
+        return $this->options['process'] !== false;
     }
 
     /**
@@ -128,16 +143,6 @@ class Column
     }
 
     /**
-     * Returns whether this column has a callback or not.
-     *
-     * @return bool
-     */
-    public function hasRenderCallback()
-    {
-        return $this->options['render'] !== false;
-    }
-
-    /**
      * Returns whether the column can be searched or not.
      *
      * @return bool
@@ -206,7 +211,7 @@ class Column
             'searchable' => false,
             'sortable' => true,
             'type' => 'dynamic',
-            'render' => false,
+            'process' => false,
             'dtRowId' => false,
             'dtRowClass' => false,
         ), $options);

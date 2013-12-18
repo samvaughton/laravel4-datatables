@@ -64,7 +64,7 @@ class LaravelBuilder implements BuilderInterface
     public function filter($filterData)
     {
         $this->query->where(function ($query) use ($filterData) {
-            foreach($filterData as $colData) {
+            foreach($filterData['columns'] as $colData) {
                 $column = $colData['column'];
 
                 // See if this column is searchable
