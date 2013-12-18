@@ -6,6 +6,12 @@ class Column
 {
 
     /**
+     * Constants to define what sort of column is being represented.
+     */
+    const TYPE_STATIC = 'static';
+    const TYPE_DYNAMIC = 'dynamic';
+
+    /**
      * @var string The column name
      */
     private $name;
@@ -31,7 +37,7 @@ class Column
     private $dtRowClass;
 
     /**
-     * @param $name string|array The column name
+     * @param $name string|array The column name.
      * @param $options array|null Options
      */
     public function __construct($name, array $options = array())
