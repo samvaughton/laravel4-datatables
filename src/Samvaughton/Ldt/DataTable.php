@@ -68,25 +68,6 @@ class DataTable
     }
 
     /**
-     * This is the final method that should be called after all the configuration. This will
-     * return either the json encoded version or just an array of the data.
-     *
-     */
-    public function make($jsonEncoded = false)
-    {
-        $results = $this->getResults();
-
-        $data = array(
-            "sEcho" => (int) $this->getParam('sEcho', 0),
-            "iTotalRecords" => $this->getTotalCount(),
-            "iTotalDisplayRecords" => $this->getFilterCount(),
-            "aaData" => $this->parseResults($results),
-        );
-
-        return ($jsonEncoded) ? json_encode($data) : $data;
-    }
-
-    /**
      * Converts any strings to the column class. This is a bit of a
      * code smell as we are instantiating a new column class and not
      * passing one. Should be OK though as we do accept an array of
@@ -99,6 +80,25 @@ class DataTable
         foreach ($columns as $column) {
             $this->columns[] = (!$column instanceof Column) ? new Column((string) $column) : $column;
         }
+    }
+
+    /**
+     * This is the final method that should be called after all the configuration. This will
+     * return either the json encoded version or just an array of the data.
+     *
+     */
+    public function make($jsonEncoded = false)
+    {
+        $results = $this->getResults();
+
+        $data = array(
+            "sEcho" => (int) $this->getParam('sEcho', 0),
+            "iTotalRecords" =>$this->totalRecords,
+            "iTotalDisplayRecords" => $this->filteredRecords,
+            "aaData" => $this->parseResults($results),
+        );
+
+        return ($jsonEncoded) ? json_encode($data) : $data;
     }
 
     /**
@@ -115,7 +115,13 @@ class DataTable
 
         $this->applyFiltering();
 
-        return $this->query->get();
+        $results = $this->query->get();
+
+        if ($results instanceof \Illuminate\Database\Eloquent\Collection) {
+            $results = $this->convertEloquentToArray($results);
+        }
+
+        return $results;
     }
 
     /**
@@ -280,6 +286,22 @@ class DataTable
     }
 
     /**
+     * Converts the eloquent collection into an array -> stdClass data structure.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection $results
+     * @return array
+     */
+    private function convertEloquentToArray($results)
+    {
+        $array = array();
+        foreach($results->toArray() as $result) {
+            $array[] = (object) $result;
+        }
+
+        return $array;
+    }
+
+    /**
      * Returns the column if it exists, if not then return false.
      *
      * @param $key string
@@ -292,26 +314,6 @@ class DataTable
         }
 
         return false;
-    }
-
-    /**
-     * Returns the total amount of records the filtered query returns.
-     *
-     * @return int
-     */
-    private function getFilterCount()
-    {
-        return $this->filteredRecords;
-    }
-
-    /**
-     * Returns the total amount of records the generated query can possibly return.
-     *
-     * @return int
-     */
-    private function getTotalCount()
-    {
-        return $this->totalRecords;
     }
 
     /**
