@@ -21,9 +21,9 @@ class DataTable
     private $request;
 
     /**
-     * The actual prebuilt query from Laravel
+     * @var Builder\BuilderInterface
      */
-    private $query;
+    private $builder;
 
     /**
      * Holds the columns that will be rendered and displayed
