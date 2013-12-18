@@ -55,6 +55,7 @@ class LaravelBuilder implements BuilderInterface
     public function order(array $orderData)
     {
         foreach($orderData as $colData) {
+            /** @var \Samvaughton\Ldt\Column $column */
             $column = $colData['column'];
             $direction = $colData['direction'];
 
@@ -75,7 +76,9 @@ class LaravelBuilder implements BuilderInterface
     public function filter(array $filterData)
     {
         $this->query->where(function ($query) use ($filterData) {
+            /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query */
             foreach($filterData['columns'] as $colData) {
+                /** @var \Samvaughton\Ldt\Column $column */
                 $column = $colData['column'];
 
                 // See if this column is searchable
