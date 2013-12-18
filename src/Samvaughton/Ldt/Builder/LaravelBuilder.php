@@ -113,7 +113,7 @@ class LaravelBuilder implements BuilderInterface
      * @param \Illuminate\Database\Eloquent\Collection $results
      * @return array
      */
-    private function convertEloquentToArray($results)
+    public function convertEloquentToArray($results)
     {
         $array = array();
         foreach($results->toArray() as $result) {
