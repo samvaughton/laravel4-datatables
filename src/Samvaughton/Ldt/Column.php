@@ -27,16 +27,6 @@ class Column
     private $options = array();
 
     /**
-     * @var string
-     */
-    private $dtRowId;
-
-    /**
-     * @var string
-     */
-    private $dtRowClass;
-
-    /**
      * @param $name string|array The column name.
      * @param $options array|null Options
      */
@@ -105,38 +95,6 @@ class Column
     public function getSqlColumn()
     {
         return $this->sqlColumn;
-    }
-
-    /**
-     * @param string $dtRowClass
-     */
-    public function setDtRowClass($dtRowClass)
-    {
-        $this->dtRowClass = $dtRowClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDtRowClass()
-    {
-        return $this->dtRowClass;
-    }
-
-    /**
-     * @param string $dtRowId
-     */
-    public function setDtRowId($dtRowId)
-    {
-        $this->dtRowId = $dtRowId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDtRowId()
-    {
-        return $this->dtRowId;
     }
 
     /**
@@ -232,9 +190,7 @@ class Column
             'searchable' => false,
             'sortable' => true,
             'type' => 'dynamic',
-            'processor' => false,
-            'dtRowId' => false,
-            'dtRowClass' => false,
+            'processor' => false
         ), $options);
     }
 
