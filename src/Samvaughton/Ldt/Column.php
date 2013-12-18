@@ -57,7 +57,7 @@ class Column
     public function process($currentValue, $row, $originalRow)
     {
         if ($this->canProcess()) {
-            $callback = $this->options['process'];
+            $callback = $this->options['processor'];
 
             if ($callback instanceof ColumnProcessorInterface) {
                 return $callback->run($currentValue, $row, $originalRow);
@@ -76,7 +76,7 @@ class Column
      */
     public function canProcess()
     {
-        return $this->options['process'] !== false;
+        return $this->options['processor'] !== false;
     }
 
     /**
@@ -175,7 +175,7 @@ class Column
      */
     public function isStatic()
     {
-        return $this->options['type'] === 'static';
+        return $this->options['type'] === self::TYPE_STATIC;
     }
 
     /**
@@ -185,7 +185,7 @@ class Column
      */
     public function isDynamic()
     {
-        return $this->options['type'] === 'dynamic';
+        return $this->options['type'] === self::TYPE_DYNAMIC;
     }
 
     /**
@@ -217,7 +217,7 @@ class Column
             'searchable' => false,
             'sortable' => true,
             'type' => 'dynamic',
-            'process' => false,
+            'processor' => false,
             'dtRowId' => false,
             'dtRowClass' => false,
         ), $options);

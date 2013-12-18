@@ -26,11 +26,11 @@ $dth = new DataTable(\Input::all(), $customers, array(
     new Column('email', array('searchable' => true)),
     new Column('phone'),
     new Column('date_registered', array(
-        'process' => new \DateColumnProcessor()
+        'processor' => new \DateColumnProcessor()
     )),
     new Column('actions', array(
         'type' => Column::TYPE_STATIC,
-        'process' => function($value, $row, $originalRow) {
+        'processor' => function($value, $row, $originalRow) {
             return sprintf(
                 '<a href="/customer/edit/%s">Edit</a>',
                 $row['id']
