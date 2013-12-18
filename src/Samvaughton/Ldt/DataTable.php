@@ -39,6 +39,13 @@ class DataTable
     private $totalRecords;
 
     /**
+     * The amount of filtered records.
+     *
+     * @var int
+     */
+    private $filteredRecords;
+
+    /**
      * Special column parameters that DataTables ignores when displaying data.
      *
      * @var array
@@ -72,7 +79,7 @@ class DataTable
         $data = array(
             "sEcho" => (int) $this->getParam('sEcho', 0),
             "iTotalRecords" => $this->getTotalCount(),
-            "iTotalDisplayRecords" => $this->getSearchCount(),
+            "iTotalDisplayRecords" => $this->getFilterCount(),
             "aaData" => $this->parseResults($results),
         );
 
@@ -102,8 +109,10 @@ class DataTable
     private function getResults()
     {
         $this->fetchTotalCount();
+
         $this->applyPagination();
         $this->applyOrdering();
+
         $this->applyFiltering();
 
         return $this->query->get();
@@ -204,7 +213,16 @@ class DataTable
     private function fetchTotalCount()
     {
         $dupe = clone $this->query; // Clone so we don't reset the original queries select.
-        $this->totalRecords = (int) $dupe->count();
+        $this->totalRecords = $this->filteredRecords = (int) $dupe->count();
+    }
+
+    /**
+     * Counts the total amount of records from the database.
+     */
+    private function fetchFilterCount()
+    {
+        $dupe = clone $this->query; // Clone so we don't reset the original queries select.
+        $this->filteredRecords = (int) $dupe->count();
     }
 
     /**
@@ -262,6 +280,8 @@ class DataTable
                 $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
             }
         });
+
+        $this->fetchFilterCount();
     }
 
     /**
@@ -284,9 +304,9 @@ class DataTable
      *
      * @return int
      */
-    private function getSearchCount()
+    private function getFilterCount()
     {
-        return $this->totalRecords;
+        return $this->filteredRecords;
     }
 
     /**
