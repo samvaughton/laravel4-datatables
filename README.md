@@ -120,13 +120,14 @@ new Column('actions', array(
 )
 ```
 
-This is a static column that appends an edit button onto every row, it utilises the customers ID from the `$row` array.
+This is a static column that appends an edit button onto every row, it utilises the customers `id` from the `$row` array.
 You may be wondering what the `$originalRow` is for, this is an untouched row that contains every column from your
-select statement. If we were to modify the ID column and set the value to `null` then this actions column would return
+select statement. Using the above code, if we were to modify the `id` column and set the value to `null` then this
+processor would return:
 
     <a href="/customer/edit/">Edit</a>
 
-As we have already modified the ID previously, in this case we could utilise the `$originalRow` to get the unaltered
+Due to the `id` column being modified before this one. Here we could utilise `$originalRow['id']` to get the unaltered
 value.
 
 *If you are trying to use a column that isn't defined within the column array then you have to use `$originalRow` as
