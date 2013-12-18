@@ -30,7 +30,48 @@ class TestRequest extends PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(0, $request->getEcho());
+    }
 
+    public function testPaging()
+    {
+        $stubs = array(
+            $stub = array(
+                'request' => array(
+                    'iDisplayStart' => 0,
+                    'iDisplayLength' => 10,
+                ),
+                'actual' => array(
+                    'start' => 0,
+                    'length' => 10,
+                )
+            ),
+            $stub = array(
+                'request' => array(
+                    'iDisplayStart' => 20,
+                    'iDisplayLength' => 100,
+                ),
+                'actual' => array(
+                    'start' => 20,
+                    'length' => 100,
+                )
+            ),
+            $stub = array(
+                'request' => array(
+                    'iDisplayStart' => "aaa",
+                    'iDisplayLength' => "sefg",
+                ),
+                'actual' => array(
+                    'start' => 0,
+                    'length' => 0,
+                )
+            ),
+        );
+
+        foreach($stubs as $stub) {
+            $request = new Request($stub['request']);
+            $this->assertEquals($stub['actual']['start'], $request->getPaginationStart());
+            $this->assertEquals($stub['actual']['length'], $request->getPaginationLength());
+        }
     }
 
     public function testSortableColumns()
