@@ -43,7 +43,8 @@ class LaravelBuilder implements BuilderInterface
      */
     public function paginate($start, $length)
     {
-        $this->query->skip($start)->take($length);
+        $this->query->skip($start);
+        $this->query->take($length);
     }
 
     /**
