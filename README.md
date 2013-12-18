@@ -20,24 +20,28 @@ $customers = \Customer::select(
     'phone_mobile AS phone', 'date_registered'
 );
 
-$dth = new DataTable(\Input::all(), $customers, array(
-    new Column('id'),
-    new Column('name'), array('searchable' => true)),
-    new Column('email', array('searchable' => true)),
-    new Column('phone'),
-    new Column('date_registered', array(
-        'processor' => new \DateColumnProcessor()
-    )),
-    new Column('actions', array(
-        'type' => Column::TYPE_STATIC,
-        'processor' => function($value, $row, $originalRow) {
-            return sprintf(
-                '<a href="/customer/edit/%s">Edit</a>',
-                $row['id']
-            );
-        }
+$dth = new DataTable(
+    new LaravelBuilder($customers),
+    new Request(\Input::all()),
+    array(
+        new Column('id'),
+        new Column('name'), array('searchable' => true)),
+        new Column('email', array('searchable' => true)),
+        new Column('phone'),
+        new Column('date_registered', array(
+            'processor' => new \DateColumnProcessor()
+        )),
+        new Column('actions', array(
+            'type' => Column::TYPE_STATIC,
+            'processor' => function($value, $row, $originalRow) {
+                return sprintf(
+                    '<a href="/customer/edit/%s">Edit</a>',
+                    $row['id']
+                );
+            }
+        )
     )
-));
+);
 
 return $dth->make();
 ```
