@@ -198,12 +198,25 @@ class Column
     {
         if (is_array($name)) {
             $this->name = $name[0];
-            $this->sqlColumn = $name[1];
+            $this->sqlColumn = $this->parseColumn($name[1]);
             return;
         }
 
         $this->name = (string) $name;
         $this->sqlColumn = (string) $name;
+    }
+
+    /**
+     * Parses the column to only get the non-alias section.
+     * 'customers.name AS custName' would return 'customers.name'
+     *
+     * @param string $column
+     * @return string
+     */
+    private function parseColumn($column)
+    {
+        $sqlParts = preg_split("/ AS /i", $column);
+        return $sqlParts[0];
     }
 
     /**
