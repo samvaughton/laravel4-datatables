@@ -5,6 +5,41 @@ use Samvaughton\Ldt\Request;
 class TestRequest extends PHPUnit_Framework_TestCase
 {
 
+    public function testGet()
+    {
+        $stub = array(
+            'name' => 'john doe',
+            'age' => 10,
+            'alive' => true,
+            'wants' => null
+        );
+
+        $request = new Request($stub);
+
+        $this->assertEquals('john doe', $request->get('name'));
+        $this->assertEquals('', $request->get('aiwydg', ''));
+        $this->assertEquals('', $request->get('aawdwaiwydg'));
+        $this->assertEquals(10, $request->get('age'));
+        $this->assertEquals(null, $request->get('dfawdw'));
+    }
+
+    public function testSet()
+    {
+        $stub = array('data' => 'john');
+        $request = new Request($stub);
+        $request->set('data', 'james');
+
+        $this->assertEquals('james', $request->get('data'));
+
+        $request->set(array(
+            'param1' => 'one',
+            'param2' => 'two'
+        ));
+
+        $this->assertEquals('one', $request->get('param1'));
+        $this->assertEquals('two', $request->get('param2'));
+    }
+
     public function testEcho()
     {
         $request = new Request(array(
@@ -140,6 +175,76 @@ class TestRequest extends PHPUnit_Framework_TestCase
             $this->assertEquals($colIndexKey[$index], $column['column']);
         }
 
+    }
+
+    public function testFilterableColumns()
+    {
+        $stub = array(
+            'sEcho'          => 15,
+            'iColumns'       => 7,
+            'sColumns'       => '',
+            'iDisplayStart'  => 0,
+            'iDisplayLength' => 10,
+            'mDataProp_0'    => 0,
+            'mDataProp_1'    => 1,
+            'mDataProp_2'    => 2,
+            'mDataProp_3'    => 3,
+            'mDataProp_4'    => 4,
+            'mDataProp_5'    => 5,
+            'mDataProp_6'    => 6,
+            'sSearch'        => '',
+            'bRegex'         => false,
+            'sSearch_0'      => '',
+            'bRegex_0'       => false,
+            'bSearchable_0'  => true,
+            'sSearch_1'      => '',
+            'bRegex_1'       => false,
+            'bSearchable_1'  => true,
+            'sSearch_2'      => '',
+            'bRegex_2'       => false,
+            'bSearchable_2'  => true,
+            'sSearch_3'      => '',
+            'bRegex_3'       => false,
+            'bSearchable_3'  => true,
+            'sSearch_4'      => '',
+            'bRegex_4'       => false,
+            'bSearchable_4'  => true,
+            'sSearch_5'      => '',
+            'bRegex_5'       => false,
+            'bSearchable_5'  => false,
+            'sSearch_6'      => '',
+            'bRegex_6'       => false,
+            'bSearchable_6'  => true,
+            'iSortCol_0'     => 0,
+            'sSortDir_0'     => 'asc',
+            'iSortingCols'   => 1,
+            'bSortable_0'    => true,
+            'bSortable_1'    => true,
+            'bSortable_2'    => true,
+            'bSortable_3'    => true,
+            'bSortable_4'    => true,
+            'bSortable_5'    => false,
+            'bSortable_6'    => true,
+        );
+
+        $request = new Request($stub);
+
+        $filterable = $request->getFilterableColumns();
+
+        $this->assertEquals($stub['iColumns'], count($filterable['columns']));
+        $this->assertEquals(false, $request->isFilterable());
+
+
+
+        /*$isSortableKey = array(true, true, true, true, true, false, true);
+        $directionKey = array('asc');
+        $colIndexKey = array(0);
+
+        foreach($filterable as $index => $column) {
+            $this->assertEquals($isSortableKey[$index], $column['sortable']);
+            $this->assertEquals($directionKey[$index], $column['direction']);
+            $this->assertEquals($colIndexKey[$index], $column['column']);
+        }*/
     }
 
 }
