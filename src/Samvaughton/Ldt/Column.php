@@ -63,7 +63,9 @@ class Column
                 return $callback->run($currentValue, $row, $originalRow);
             }
 
-            return $callback($currentValue, $row, $originalRow);
+            if (is_callable($callback)) {
+                return $callback($currentValue, $row, $originalRow);
+            }
         }
 
         return $currentValue;
