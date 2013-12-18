@@ -187,9 +187,9 @@ class Column
     private function initializeOptions(array $options)
     {
         $this->options = array_merge(array(
-            'searchable' => false,
+            'type' => self::TYPE_DYNAMIC,
             'sortable' => true,
-            'type' => 'dynamic',
+            'searchable' => false,
             'processor' => false
         ), $options);
     }
