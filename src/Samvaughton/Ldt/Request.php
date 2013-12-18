@@ -107,4 +107,15 @@ class Request
         return (isset($this->request[$key])) ? $this->request[$key] : $default;
     }
 
+    /**
+     * Change a request parameter.
+     *
+     * @param $key
+     * @param $value
+     */
+    public function set($key, $value)
+    {
+        $this->request[$key] = $value;
+    }
+
 }
