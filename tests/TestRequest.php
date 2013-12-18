@@ -234,17 +234,19 @@ class TestRequest extends PHPUnit_Framework_TestCase
         $this->assertEquals($stub['iColumns'], count($filterable['columns']));
         $this->assertEquals(false, $request->isFilterable());
 
+        $request->set('sSearch', 'test');
+        $this->assertEquals(true, $request->isFilterable());
 
+        $filterable = $request->getFilterableColumns();
+        $this->assertEquals('test', $filterable['term']);
 
-        /*$isSortableKey = array(true, true, true, true, true, false, true);
-        $directionKey = array('asc');
-        $colIndexKey = array(0);
+        $isFilterableKey = array(true, true, true, true, true, false, true);
+        $colIndexKey = array(0, 1, 2, 3, 4, 5, 6);
 
-        foreach($filterable as $index => $column) {
-            $this->assertEquals($isSortableKey[$index], $column['sortable']);
-            $this->assertEquals($directionKey[$index], $column['direction']);
+        foreach($filterable['columns'] as $index => $column) {
+            $this->assertEquals($isFilterableKey[$index], $column['searchable']);
             $this->assertEquals($colIndexKey[$index], $column['column']);
-        }*/
+        }
     }
 
 }
