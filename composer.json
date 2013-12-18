@@ -1,0 +1,20 @@
+{
+    "name": "samvaughton/ldt",
+    "description": "Laravel 4 DataTables library to handle the server-side calls.",
+    "authors": [
+        {
+            "name": "Sam Vaughton",
+            "email": "samvaughton@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Samvaughton\\Ldt": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}

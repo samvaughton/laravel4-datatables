@@ -1,4 +1,2 @@
-laravel4-datatables
-===================
+### Laravel 4 DataTables Library
 
-Laravel 4 DataTables - Server Side Library
