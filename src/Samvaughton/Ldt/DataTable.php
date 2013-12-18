@@ -3,9 +3,10 @@
 namespace Samvaughton\Ldt;
 
 /**
- * Class DataTable - Configuration over Convention
+ * Class DataTable - Configuration Over Convention
  *
- * Combines everything together to actually output the data.
+ * This class pulls together the various components
+ * of this library and ties them all together.
  *
  * @package Samvaughton\Ldt
  */
@@ -15,9 +16,9 @@ class DataTable
     /**
      * The actual requested parameters from the client side.
      *
-     * @var array
+     * @var Request
      */
-    private $input;
+    private $request;
 
     /**
      * The actual prebuilt query from Laravel
@@ -53,33 +54,15 @@ class DataTable
     private $specialColumnParameters = array('DT_RowId', 'DT_RowClass');
 
     /**
-     * The column parameter can either accept a string or a Column class,
-     * a string will be converted into a column class with no extra settings.
-     *
-     * @param $input array The requested parameters.
-     * @param $query mixed The eloquent/fluent query
-     * @param array $columns Column|string
-     */
-    public function __construct(array $input, $query, array $columns)
-    {
-        $this->input = $input;
-        $this->query = $query;
-        $this->initializeColumns($columns);
-    }
-
-    /**
-     * Converts any strings to the column class. This is a bit of a
-     * code smell as we are instantiating a new column class and not
-     * passing one. Should be OK though as we do accept an array of
-     * these classes.
-     *
+     * @param Builder\BuilderInterface $builder
+     * @param array $input
      * @param array $columns
      */
-    protected function initializeColumns(array $columns)
+    public function __construct(Builder\BuilderInterface $builder, Request $request,  array $columns)
     {
-        foreach ($columns as $column) {
-            $this->columns[] = (!$column instanceof Column) ? new Column((string) $column) : $column;
-        }
+        $this->builder = $builder;
+        $this->request = $request;
+        $this->initializeColumns($columns);
     }
 
     /**
@@ -87,13 +70,13 @@ class DataTable
      * return either the json encoded version or just an array of the data.
      *
      */
-    public function make($jsonEncoded = false)
+    public function make($jsonEncoded = true)
     {
         $results = $this->getResults();
 
         $data = array(
-            "sEcho" => (int) $this->getParam('sEcho', 0),
-            "iTotalRecords" =>$this->totalRecords,
+            "sEcho" => $this->request->getEcho(),
+            "iTotalRecords" => $this->totalRecords,
             "iTotalDisplayRecords" => $this->filteredRecords,
             "aaData" => $this->parseResults($results),
         );
@@ -101,27 +84,36 @@ class DataTable
         return ($jsonEncoded) ? json_encode($data) : $data;
     }
 
-    /**
-     * Returns the database result set.
-     *
-     * @return array
-     */
     private function getResults()
     {
-        $this->fetchTotalCount();
+        /**
+         * Set both counts to be the same right now as the request may not
+         * involve any filtering.
+         */
+        $this->totalRecords = $this->filteredRecords = $this->builder->count();
 
-        $this->applyPagination();
-        $this->applyOrdering();
+        /**
+         * Apply Pagination
+         */
+        $this->builder->paginate(
+            $this->request->getPaginationStart(),
+            $this->request->getPaginationLength()
+        );
 
-        $this->applyFiltering();
+        /**
+         * Apply Ordering
+         */
+        $this->builder->order($this->parseSortableColumns());
 
-        $results = $this->query->get();
-
-        if ($results instanceof \Illuminate\Database\Eloquent\Collection) {
-            $results = $this->convertEloquentToArray($results);
+        /**
+         * Apply Filtering
+         */
+        if ($this->request->isFilterable()) {
+            $this->builder->filter($this->parseFilterableColumns());
+            $this->filteredRecords = $this->builder->count();
         }
 
-        return $results;
+        return $this->builder->get();
     }
 
     /**
@@ -139,8 +131,7 @@ class DataTable
 
         foreach($results as $row) {
             // We want to keep an original copy of the rowData so the column manipulation can utilise it.
-            $rowData = (array) $row;
-            $filteredRow = $rowData;
+            $filteredRow = $rowData = (array) $row;
 
             foreach($rowData as $column => $value) {
                 $displayColumn = $this->getColumn($column);
@@ -154,10 +145,63 @@ class DataTable
             }
 
             $filtered[] = $this->stripColumnKeys($filteredRow);
-
         }
 
         return $filtered;
+    }
+
+
+    /**
+     * Converts the column numbers to actual column instances.
+     *
+     * @return array
+     */
+    private function parseSortableColumns()
+    {
+        $sortableColumns = $this->request->getSortableColumns();
+
+        /**
+         * Convert the column number to an actual column instance.
+         */
+        array_walk($sortableColumns, function(&$data) {
+            $data['column'] = $this->columns[$data['column']];
+        });
+
+        return $sortableColumns;
+    }
+
+    /**
+     * Converts the column numbers to actual column instances.
+     *
+     * @return array
+     */
+    private function parseFilterableColumns()
+    {
+        $filterableColumns = $this->request->getFilterableColumns();
+
+        /**
+         * Convert the column number to an actual column instance.
+         */
+        array_walk($filterableColumns['columns'], function(&$data) {
+            $data['column'] = $this->columns[$data['column']];
+        });
+
+        return $filterableColumns;
+    }
+
+    /**
+     * Converts any strings to the column class. This is a bit of a
+     * code smell as we are instantiating a new column class and not
+     * passing one. Should be OK though as we do accept an array of
+     * these classes.
+     *
+     * @param array $columns
+     */
+    private function initializeColumns(array $columns)
+    {
+        foreach ($columns as $column) {
+            $this->columns[] = (!$column instanceof Column) ? new Column((string) $column) : $column;
+        }
     }
 
     /**
@@ -214,94 +258,6 @@ class DataTable
     }
 
     /**
-     * Counts the total amount of records from the database.
-     */
-    private function fetchTotalCount()
-    {
-        $dupe = clone $this->query; // Clone so we don't reset the original queries select.
-        $this->totalRecords = $this->filteredRecords = (int) $dupe->count();
-    }
-
-    /**
-     * Counts the total amount of records from the database.
-     */
-    private function fetchFilterCount()
-    {
-        $dupe = clone $this->query; // Clone so we don't reset the original queries select.
-        $this->filteredRecords = (int) $dupe->count();
-    }
-
-    /**
-     * Applies pagination to the query based on the client side request.
-     */
-    private function applyPagination()
-    {
-        $this->query
-            ->skip($this->getParam('iDisplayStart', 0))
-            ->take($this->getParam('iDisplayLength', 10))
-        ;
-    }
-
-    /**
-     * Applies ordering to the query based on the client side request.
-     */
-    private function applyOrdering()
-    {
-        $columnsToSort = $this->getParam('iSortingCols', 1);
-
-        for($colNum = 0; $colNum < $columnsToSort; $colNum++) {
-            if (is_null($this->getParam("iSortCol_{$colNum}", null))) continue;
-
-            $direction = $this->getParam("sSortDir_{$colNum}", "asc");
-            $column = $this->columns[$this->getParam("iSortCol_{$colNum}", 0)];
-
-            if ($column->isDynamic()) $this->query->orderBy($column->getSqlColumn(), $direction);
-        }
-    }
-
-    /**
-     * Applies filtering to the query based on which columns are searchable.
-     */
-    private function applyFiltering()
-    {
-        $mainTerm = $this->getParam('sSearch');
-        if (empty($mainTerm)) return;
-
-        $columnsToSort = $this->getParam('iColumns', 1);
-
-        $this->query->where(function ($query) use ($mainTerm, $columnsToSort) {
-            for($colNum = 0; $colNum < $columnsToSort; $colNum++) {
-                $column = $this->columns[$colNum];
-                if (!$column->isSearchable()) continue;
-                if ($this->getParam("bSearchable_{$colNum}") != true) continue;
-
-                $specificTerm = $this->getParam("sSearch_{$colNum}");
-                $term = (empty($specificTerm)) ? $mainTerm : $specificTerm;
-
-                $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
-            }
-        });
-
-        $this->fetchFilterCount();
-    }
-
-    /**
-     * Converts the eloquent collection into an array -> stdClass data structure.
-     *
-     * @param \Illuminate\Database\Eloquent\Collection $results
-     * @return array
-     */
-    private function convertEloquentToArray($results)
-    {
-        $array = array();
-        foreach($results->toArray() as $result) {
-            $array[] = (object) $result;
-        }
-
-        return $array;
-    }
-
-    /**
      * Returns the column if it exists, if not then return false.
      *
      * @param $key string
@@ -314,22 +270,6 @@ class DataTable
         }
 
         return false;
-    }
-
-    /**
-     * Simply returns a request parameter. If a default is specified then
-     * if the key does not exist that parameter will be returned. If
-     * default is left as null then false will be returned.
-     *
-     * @param $key string
-     * @param $default string
-     * @return string
-     */
-    private function getParam($key, $default = null)
-    {
-        if (isset($this->input[$key])) return $this->input[$key];
-
-        return ($default == null) ? false : $default;
     }
 
 }
