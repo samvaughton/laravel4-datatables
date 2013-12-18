@@ -55,7 +55,7 @@ class DataTable
 
     /**
      * @param Builder\BuilderInterface $builder
-     * @param array $input
+     * @param Request $request
      * @param array $columns
      */
     public function __construct(Builder\BuilderInterface $builder, Request $request,  array $columns)

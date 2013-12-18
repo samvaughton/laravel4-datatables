@@ -61,7 +61,8 @@ class Request
 
             $columns[] = array(
                 'column' => $this->get("iSortCol_{$colNum}", 0),
-                'direction' => $this->get("sSortDir_{$colNum}", "asc")
+                'direction' => $this->get("sSortDir_{$colNum}", "asc"),
+                'sortable' => ($this->get("bSortable_{$colNum}", false) == true) ? true : false
             );
         }
 

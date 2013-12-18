@@ -37,6 +37,9 @@ class LaravelBuilder implements BuilderInterface
 
     /**
      * Applies pagination to the query based on the client side request.
+     *
+     * @param string $start
+     * @param string $length
      */
     public function paginate($start, $length)
     {
@@ -45,12 +48,17 @@ class LaravelBuilder implements BuilderInterface
 
     /**
      * Applies ordering to the query based on the client side request.
+     *
+     * @param array $orderData
      */
-    public function order($orderData)
+    public function order(array $orderData)
     {
         foreach($orderData as $colData) {
             $column = $colData['column'];
             $direction = $colData['direction'];
+
+            // Check if this column is sortable
+            if (!$column->isSortable() || $colData['sortable'] == false) continue;
 
             if ($column->isDynamic()) {
                 $this->query->orderBy($column->getSqlColumn(), $direction);
@@ -60,8 +68,10 @@ class LaravelBuilder implements BuilderInterface
 
     /**
      * Applies filtering to the query based on which columns are searchable.
+     *
+     * @param array $filterData
      */
-    public function filter($filterData)
+    public function filter(array $filterData)
     {
         $this->query->where(function ($query) use ($filterData) {
             foreach($filterData['columns'] as $colData) {
