@@ -60,7 +60,7 @@ class LaravelBuilder implements BuilderInterface
             $direction = $colData['direction'];
 
             // Check if this column is sortable
-            if (!$column->isSortable() || $colData['sortable'] == false) continue;
+            if (!$column->isSortable() || !$colData['sortable']) continue;
 
             if ($column->isDynamic()) {
                 $this->query->orderBy($column->getSqlColumn(), $direction);
