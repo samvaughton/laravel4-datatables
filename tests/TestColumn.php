@@ -52,11 +52,12 @@ class TestColumn extends PHPUnit_Framework_TestCase
 
     public function testFunctionCallback()
     {
+        $self = $this;
         $col = new Column("name", array(
-            'processor' => function($value, $row, $originalRow) {
-                $this->assertEquals('test', $value);
-                $this->assertEquals('test', $row['name']);
-                $this->assertEquals('test', $originalRow['name']);
+            'processor' => function($value, $row, $originalRow) use ($self) {
+                $self->assertEquals('test', $value);
+                $self->assertEquals('test', $row['name']);
+                $self->assertEquals('test', $originalRow['name']);
                 return "~{$value}";
             }
         ));
