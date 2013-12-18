@@ -9,7 +9,9 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "illuminate/database": "4.1.*"
+        "illuminate/database": "4.1.*",
+        "phpunit/phpunit": "3.7.*",
+        "mockery/mockery": "dev-master@dev"
     },
     "autoload": {
         "psr-0": {
