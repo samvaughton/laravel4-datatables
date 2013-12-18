@@ -5,6 +5,34 @@ use Samvaughton\Ldt\Request;
 class TestRequest extends PHPUnit_Framework_TestCase
 {
 
+    public function testEcho()
+    {
+        $request = new Request(array(
+            'sEcho' => 1
+        ));
+
+        $this->assertEquals(1, $request->getEcho());
+
+        $request = new Request(array(
+            'sEcho' => 54
+        ));
+
+        $this->assertEquals(54, $request->getEcho());
+
+        $request = new Request(array(
+            'sEcho' => 0
+        ));
+
+        $this->assertEquals(0, $request->getEcho());
+
+        $request = new Request(array(
+            'sEcho' => "test"
+        ));
+
+        $this->assertEquals(0, $request->getEcho());
+
+    }
+
     public function testSortableColumns()
     {
         $stub = array(
