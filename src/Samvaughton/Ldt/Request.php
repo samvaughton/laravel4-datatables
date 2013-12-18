@@ -110,12 +110,17 @@ class Request
     /**
      * Change a request parameter.
      *
-     * @param $key
-     * @param $value
+     * @param string|array $data/$key
+     * @param string|int|bool|null $value
      */
-    public function set($key, $value)
+    public function set($data, $value = null)
     {
-        $this->request[$key] = $value;
+        if (is_array($data)) {
+            foreach($data as $key => $value) $this->request[$key] = $value;
+            return;
+        }
+
+        $this->request[$data] = $value;
     }
 
 }
