@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/samvaughton/laravel4-datatables.png?branch=master)](https://travis-ci.org/samvaughton/laravel4-datatables)
 
-This library prefers configuration over convention (as opposed to convention over configuration). Which allows for greater flexibility without dramatically increasing the code required.
+This library prefers configuration over convention (as opposed to convention over configuration). Which allows for
+greater flexibility without dramatically increasing the code required.
 
 ## Composer
 
@@ -47,21 +48,25 @@ $dth = new DataTable(
 
 return $dth->make();
 ```
-Quite a lot is going on here, but it is very readable. The `DataTable` class accepts three parameters. A class that implements `BuilderInterface` (there is
-one already built for Laravel), a `Request` class which handles the parsing of the client side request and thirdly an array of columns which are visible to the user.
+Quite a lot is going on here, but it is very readable. The `DataTable` class accepts three parameters. A class that
+implements `BuilderInterface` (there is one already built for Laravel), a `Request` class which handles the parsing of
+the client side request and thirdly an array of columns which are visible to the user.
 
 The first two parameters will be kept exactly the same 99% of the time.
 
 ### Column
 
-The column class accepts two parameters, the first one is required. It can either be a string or an array, this depends on the complexity of the column.
+The column class accepts two parameters, the first one is required. It can either be a string or an array, this depends
+on the complexity of the column.
 
-Each column can either be **dynamic** or **static**. A dynamic column is one that originates from the data source. Whereas
-static column appended onto the results after being fetched. Such as an actions column that contains edit, delete etc..
+Each column can either be **dynamic** or **static**. A dynamic column is one that originates from the data source.
+Whereas a static column is appended onto the results after being fetched. Such as an actions column that contains
+buttons for edit, delete etc..
 
 #### Aliases
 
-If you are creating alias for in your query and performing searches these columns also, then you will need to use the array to define the SQL column as well. An example will clear this up.
+If you are using aliases in your query and performing searches as well, then you will need to use an array to define the
+SQL column separately. An example will clear this up.
 
 ```php
 $query = DB::table('customers')->select('customers.name AS customerName');
@@ -76,11 +81,17 @@ $dth = new DataTable(
 );
 ```
 
-The select statement is using an alias, since MySQL cannot utilise aliases within the `WHERE` clause, we have to use its original column name `customers.name`.
+The select statement is using an alias, since MySQL cannot utilise aliases within the `WHERE` clause, we have to use its
+original column name `customers.name`. Otherwise the generated SQL for `WHERE` would look something like:
+
+    WHERE `customerName` LIKE '%john doe%'
+
+Which is illegal.
 
 #### Options
 
-The column class has default options which are listed below and explained, these can be set via the second parameter as in the example above.
+The column class has default options which are listed below and explained, these can be set via the second parameter
+like the example above.
 
 ```php
 'type'       => self::TYPE_DYNAMIC
@@ -88,13 +99,71 @@ The column class has default options which are listed below and explained, these
 'searchable' => false
 'processor'  => false
 ```
- - `type` can be `self::TYPE_DYNAMIC` or `self::TYPE_STATIC`.
+ - `type` can be `TYPE_DYNAMIC` or `TYPE_STATIC`.
  - `sortable` and `searchable` are booleans (true/false).
- - `processor` is a callback / class that is run after the results have been fetched to convert data say from a UNIX timestamp to a more readable date.
+ - `processor` is a callback / class that implements the `ColumnProcessorInterface`.
+
+#### Processor
+
+The processor options allows you to run a function against each column's data, this is for scenarios where you need to
+append some action buttons or convert a unix timestamp to a more readable date.
+
+```php
+new Column('actions', array(
+    'type' => Column::TYPE_STATIC,
+    'processor' => function($value, $row, $originalRow) {
+        return sprintf(
+            '<a href="/customer/edit/%s">Edit</a>',
+            $row['id']
+        );
+    }
+)
+```
+
+This is a static column that appends an edit button onto every row, it utilises the customers ID from the `$row` array.
+You may be wondering what the `$originalRow` is for, this is an untouched row that contains every column from your
+select statement. If we were to modify the ID column and set the value to `null` then this actions column would return
+
+    <a href="/customer/edit/">Edit</a>
+
+As we have already modified the ID previously, in this case we could utilise the `$originalRow` to get the unaltered
+value.
+
+*If you are trying to use a column that isn't defined within the column array then you have to use `$originalRow` as
+these columns are not contained within `$row`.*
+
+Instead of passing a callback, you can also pass a class that implements the `ColumnProcessorInterface`.
+
+```php
+<?php
+
+namespace \Samvaughton\Ldt;
+
+class ExampleColumnProcessor implements ColumnProcessorInterface
+{
+
+    /**
+     * This will simply append the date to the column.
+     */
+    public function run($value, $row, $originalRow)
+    {
+        return sprintf("%s - %s", $value, date("Y-m-d"));
+    }
+
+}
+```
+
+The column instantiation may look something like this:
+
+```php
+new Column('date', array(
+    'type' => Column::TYPE_STATIC,
+    'processor' => new \Samvaughton\Ldt\ExampleColumnProcessor
+)
+```
 
 ## Todo
 
-- Complete README.md
-- Add custom filtering callbacks
 - Write tests
-- Clean up code some more
+- Improve documentation
+- Add custom filtering callbacks/class
