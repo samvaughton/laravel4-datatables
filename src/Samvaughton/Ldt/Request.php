@@ -17,26 +17,41 @@ class Request
      */
     private $request = array();
 
+    /**
+     * @param array $request
+     */
     public function __construct(array $request)
     {
         $this->request = $request;
     }
 
+    /**
+     * @return int
+     */
     public function getEcho()
     {
         return (int) $this->get('sEcho');
     }
 
+    /**
+     * @return int
+     */
     public function getPaginationStart()
     {
         return (int) $this->get('iDisplayStart', 0);
     }
 
+    /**
+     * @return int
+     */
     public function getPaginationLength()
     {
         return (int) $this->get('iDisplayLength', 10);
     }
 
+    /**
+     * @return array
+     */
     public function getSortableColumns()
     {
         $columns = array();
@@ -53,11 +68,17 @@ class Request
         return $columns;
     }
 
+    /**
+     * @return bool
+     */
     public function isFilterable()
     {
         return !empty($this->request['sSearch']);
     }
 
+    /**
+     * @return array
+     */
     public function getFilterableColumns()
     {
         $filter = array('term' => $this->get('sSearch', ''), 'columns' => array());
