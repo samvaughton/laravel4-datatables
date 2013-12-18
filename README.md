@@ -26,13 +26,11 @@ $dth = new DataTable(\Input::all(), $customers, array(
     new Column('email', array('searchable' => true)),
     new Column('phone'),
     new Column('date_registered', array(
-        'render' => function($value, $row, $originalRow) {
-            return date("Y-m-d", strtotime($value));
-        }
+        'process' => new \DateColumnProcessor()
     )),
     new Column('actions', array(
-        'type' => 'static',
-        'render' => function($value, $row, $originalRow) {
+        'type' => Column::TYPE_STATIC,
+        'process' => function($value, $row, $originalRow) {
             return sprintf(
                 '<a href="/customer/edit/%s">Edit</a>',
                 $row['id']
@@ -41,10 +39,13 @@ $dth = new DataTable(\Input::all(), $customers, array(
     )
 ));
 
-return $dth->make(true);
+return $dth->make();
 ```
 Quite a lot is going on here, but it is very readable. One thing to note is the order of the columns have to match.
 
 #### Todo
 
 - Complete README.md
+- Add custom filtering callbacks
+- Write tests
+- Clean up code some more
