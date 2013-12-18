@@ -16,8 +16,21 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $this->assertEquals(false, $col->isStatic());
         $this->assertEquals(false, $col->isSearchable());
         $this->assertEquals(false, $col->canProcess());
-        $this->assertEquals(false, $col->getDtRowId());
-        $this->assertEquals(false, $col->getDtRowClass());
+    }
+
+    public function testCustomOptions()
+    {
+        $col = new Column("name", array(
+            'sortable' => false,
+            'searchable' => true,
+            'type' => Column::TYPE_STATIC
+        ));
+
+        $this->assertEquals(false, $col->isSortable());
+        $this->assertEquals(false, $col->isDynamic());
+        $this->assertEquals(true, $col->isStatic());
+        $this->assertEquals(false, $col->isSearchable()); // Static column, cant be searched
+        $this->assertEquals(false, $col->canProcess());
     }
 
     public function testSqlColumn()
@@ -31,6 +44,12 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $this->assertEquals("contacts.name", $col2->getSqlColumn());
     }
 
+    public function testToString()
+    {
+        $col = new Column("name");
+        $this->assertEquals("name", (string) $col);
+    }
+
     public function testFunctionCallback()
     {
         $col = new Column("name", array(
@@ -42,6 +61,8 @@ class TestColumn extends PHPUnit_Framework_TestCase
             }
         ));
 
+        $this->assertTrue($col->canProcess());
+
         $this->assertEquals("~test", $col->process(
             'test', array('name' => 'test'), array('name' => 'test')
         ));
@@ -52,6 +73,8 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $col = new Column("name", array(
             'processor' => new ExampleColumnProcessor()
         ));
+
+        $this->assertTrue($col->canProcess());
 
         $this->assertEquals("test - 1", $col->process(
             'test', array('name' => 'test'), array('name' => 'test')
