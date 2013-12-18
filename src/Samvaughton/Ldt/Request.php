@@ -102,7 +102,7 @@ class Request
      * @param string $default
      * @return string
      */
-    private function get($key, $default = '')
+    public function get($key, $default = '')
     {
         return (isset($this->request[$key])) ? $this->request[$key] : $default;
     }
