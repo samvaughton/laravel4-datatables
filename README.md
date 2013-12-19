@@ -2,8 +2,7 @@
 
 [![Build Status](https://travis-ci.org/samvaughton/laravel4-datatables.png?branch=master)](https://travis-ci.org/samvaughton/laravel4-datatables)
 
-This library prefers configuration over convention (as opposed to convention over configuration). Which allows for
-greater flexibility without dramatically increasing the code required.
+This library aims to be different than existing DataTable packages, taking a different approach that allows greater flexibility.
 
 ## Composer
 
