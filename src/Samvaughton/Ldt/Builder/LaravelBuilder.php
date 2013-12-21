@@ -138,4 +138,12 @@ class LaravelBuilder implements BuilderInterface
         return $array;
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
 }

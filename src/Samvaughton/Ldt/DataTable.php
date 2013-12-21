@@ -272,4 +272,12 @@ class DataTable
         return false;
     }
 
+    /**
+     * @return \Samvaughton\Ldt\Builder\BuilderInterface
+     */
+    public function getBuilder()
+    {
+        return $this->builder;
+    }
+
 }
