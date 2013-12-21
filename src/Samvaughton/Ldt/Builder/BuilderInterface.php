@@ -36,4 +36,11 @@ interface BuilderInterface
      */
     public function get();
 
+    /**
+     * Returns the query object/string.
+     *
+     * @return mixed
+     */
+    public function getQuery();
+
 }
