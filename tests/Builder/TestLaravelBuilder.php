@@ -100,14 +100,19 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
 
     public function testFiltering()
     {
-        return;
-        $fluent = \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
+        $query = \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
             /** @var \Mockery\Mock $mock */
-            $mock->shouldReceive('where');
-            $mock->shouldReceive('orWhere');
+            $mock->makePartial();
+            $mock->shouldReceive('newQuery')->andReturn(
+                \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
+                    /** @var \Mockery\Mock $mock */
+                    $mock->makePartial();
+                    $mock->shouldReceive('orWhere')->twice();
+                })
+            );
         });
 
-        $builder = new LaravelBuilder($fluent);
+        $builder = new LaravelBuilder($query);
 
         $builder->filter(array(
             'term' => 'search',
@@ -120,6 +125,33 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                         }),
                     'term'  => "search",
                     'searchable'  => true,
+                ),
+                array(
+                    'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
+                            /** @var \Mockery\Mock $mock */
+                            $mock->shouldReceive('isSearchable')->once()->andReturn(true);
+                            $mock->shouldReceive('getSqlColumn')->once()->andReturn("test");
+                        }),
+                    'term'  => "search",
+                    'searchable'  => true,
+                ),
+                array(
+                    'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
+                            /** @var \Mockery\Mock $mock */
+                            $mock->shouldReceive('isSearchable')->once()->andReturn(false);
+                            $mock->shouldReceive('getSqlColumn')->never();
+                        }),
+                    'term'  => "search",
+                    'searchable'  => true,
+                ),
+                array(
+                    'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
+                            /** @var \Mockery\Mock $mock */
+                            $mock->shouldReceive('isSearchable')->once()->andReturn(true);
+                            $mock->shouldReceive('getSqlColumn')->never();
+                        }),
+                    'term'  => "search",
+                    'searchable'  => false,
                 ),
             )
         ));
