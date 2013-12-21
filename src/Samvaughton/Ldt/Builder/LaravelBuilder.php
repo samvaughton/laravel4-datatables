@@ -74,22 +74,34 @@ class LaravelBuilder implements BuilderInterface
     public function filter(array $filterData)
     {
         $this->query->where(function ($query) use ($filterData) {
-            /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query */
-            foreach($filterData['columns'] as $colData) {
-                /** @var \Samvaughton\Ldt\Column $column */
-                $column = $colData['column'];
-
-                // See if this column is searchable
-                if (!$column->isSearchable() || !$colData['searchable']) continue;
-
-                // If the individual column term is empty, use the main term
-                $term = (empty($colData['term'])) ? $filterData['term'] : $colData['term'];
-
-                // Actually apply the filter
-                $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
-            }
+            $this->applyFilter($query, $filterData);
         });
     }
+
+    /**
+     * Actually applies each filter in the foreach loop.
+     *
+     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query
+     * @param array $filterData
+     */
+    private function applyFilter($query, array $filterData)
+    {
+        /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query */
+        foreach($filterData['columns'] as $colData) {
+            /** @var \Samvaughton\Ldt\Column $column */
+            $column = $colData['column'];
+
+            // See if this column is searchable
+            if (!$column->isSearchable() || !$colData['searchable']) continue;
+
+            // If the individual column term is empty, use the main term
+            $term = (empty($colData['term'])) ? $filterData['term'] : $colData['term'];
+
+            // Actually apply the filter
+            $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
+        }
+    }
+
 
     /**
      * Returns the database result set.
