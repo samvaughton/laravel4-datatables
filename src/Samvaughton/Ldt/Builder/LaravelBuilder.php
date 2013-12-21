@@ -69,13 +69,28 @@ class LaravelBuilder implements BuilderInterface
     /**
      * Applies filtering to the query based on which columns are searchable.
      *
+     * @note: Cannot separate this into different methods as PHP 5.3 does not support
+     * class scope injection into closures.
+     *
      * @param array $filterData
      */
     public function filter(array $filterData)
     {
-        $self = $this; // PHP 5.3
-        $this->query->where(function ($query) use ($self, $filterData) {
-            $self->applyFilter($query, $filterData);
+        $this->query->where(function ($query) use ($filterData) {
+            /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query */
+            foreach($filterData['columns'] as $colData) {
+                /** @var \Samvaughton\Ldt\Column $column */
+                $column = $colData['column'];
+
+                // See if this column is searchable
+                if (!$column->isSearchable() || !$colData['searchable']) continue;
+
+                // If the individual column term is empty, use the main term
+                $term = (empty($colData['term'])) ? $filterData['term'] : $colData['term'];
+
+                // Actually apply the filter
+                $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
+            }
         });
     }
 
@@ -87,20 +102,7 @@ class LaravelBuilder implements BuilderInterface
      */
     private function applyFilter($query, array $filterData)
     {
-        /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query */
-        foreach($filterData['columns'] as $colData) {
-            /** @var \Samvaughton\Ldt\Column $column */
-            $column = $colData['column'];
 
-            // See if this column is searchable
-            if (!$column->isSearchable() || !$colData['searchable']) continue;
-
-            // If the individual column term is empty, use the main term
-            $term = (empty($colData['term'])) ? $filterData['term'] : $colData['term'];
-
-            // Actually apply the filter
-            $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
-        }
     }
 
 
