@@ -103,6 +103,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
         $query = \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
             /** @var \Mockery\Mock $mock */
             $mock->makePartial();
+            $mock->shouldReceive('where')->once()->passthru();
             $mock->shouldReceive('newQuery')->andReturn(
                 \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
                     /** @var \Mockery\Mock $mock */
