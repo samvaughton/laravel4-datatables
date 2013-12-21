@@ -73,8 +73,9 @@ class LaravelBuilder implements BuilderInterface
      */
     public function filter(array $filterData)
     {
-        $this->query->where(function ($query) use ($filterData) {
-            $this->applyFilter($query, $filterData);
+        $self = $this; // PHP 5.3
+        $this->query->where(function ($query) use ($self, $filterData) {
+            $self->applyFilter($query, $filterData);
         });
     }
 
