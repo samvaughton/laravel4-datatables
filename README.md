@@ -93,16 +93,18 @@ The column class has default options which are listed below and explained, these
 like the example above.
 
 ```php
-'type'       => self::TYPE_DYNAMIC
-'sortable'   => true
-'searchable' => false
-'rowProcessor'  => false
+'type'            => self::TYPE_DYNAMIC
+'sortable'        => true
+'searchable'      => false
+'rowProcessor'    => false
+'filterProcessor' => false
 ```
  - `type` can be `TYPE_DYNAMIC` or `TYPE_STATIC`.
  - `sortable` and `searchable` are booleans (true/false).
- - `rowProcessor` is a callback / class that implements the `ColumnProcessorInterface`.
+ - `rowProcessor` is a callback / class that implements the `RowProcessorInterface`.
+ - `filterProcessor` is a callback / class that implements the `FilterProcessorInterface`.
 
-#### Processor
+#### Processor's
 
 The `rowProcessor` options allows you to run a function against each column's data, this is for scenarios where you need to
 append some action buttons or convert a unix timestamp to a more readable date.
@@ -132,7 +134,7 @@ value.
 *If you are trying to use a column that isn't defined within the column array then you have to use `$originalRow` as
 these columns are not contained within `$row`.*
 
-Instead of passing a callback, you can also pass a class that implements the `ColumnProcessorInterface`.
+Instead of passing a callback, you can also pass a class that implements the `RowProcessorInterface`.
 
 ```php
 <?php
@@ -159,6 +161,18 @@ The column instantiation may look something like this:
 new Column('date', array(
     'type' => Column::TYPE_STATIC,
     'rowProcessor' => new \Samvaughton\Ldt\ExampleColumnProcessor
+)
+```
+
+The `filterProcessor` option is similar to the `rowProcessor` except that it modifies the search term before the query
+is executed to fetch the results. Say you only wanted users to search in lowercase you could provide a callback/class
+that performs this.
+
+```php
+new Column('name', array(
+    'filterProcessor' => function($term) {
+        return strtolower(trim($term));
+    }
 )
 ```
 
