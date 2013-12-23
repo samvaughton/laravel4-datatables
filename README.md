@@ -18,10 +18,7 @@ Then run `composer update`.
 ## Simple Example
 
 ```php
-$customers = \Customer::select(
-    'id', 'name', 'email_address AS email',
-    'phone_mobile AS phone', 'date_registered'
-);
+$customers = \Customer::select('id', 'name', 'email', 'phone', 'date_registered');
 
 $dth = new DataTable(
     new LaravelBuilder($customers),
