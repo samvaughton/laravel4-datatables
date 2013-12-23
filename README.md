@@ -93,16 +93,18 @@ The column class has default options which are listed below and explained, these
 like the example above.
 
 ```php
-'type'            => self::TYPE_DYNAMIC
-'sortable'        => true
-'searchable'      => false
-'rowProcessor'    => false
-'filterTermProcessor' => false
+'type'                 => self::TYPE_DYNAMIC
+'sortable'             => true
+'searchable'           => false
+'rowProcessor'         => false
+'filterTermProcessor'  => false
+'filterQueryProcessor' => false
 ```
  - `type` can be `TYPE_DYNAMIC` or `TYPE_STATIC`.
  - `sortable` and `searchable` are booleans (true/false).
  - `rowProcessor` is a callback / class that implements the `RowProcessorInterface`.
  - `filterTermProcessor` is a callback / class that implements the `FilterTermProcessorInterface`.
+ - `filterQueryProcessor` is a callback / class that implements the `FilterQueryProcessorInterface`. This is a bit more advanced and lets you define your own SQL to filter against.
 
 #### Processor's
 
@@ -176,6 +178,8 @@ new Column('name', array(
 )
 ```
 
+**You can find examples of these processors within the `Samvaughton\Ldt\Column` namespace.**
+
 ## Contributing
 
 I would love for people to help contribute to this library, send a pull request and I'll check it out!
@@ -184,4 +188,3 @@ I would love for people to help contribute to this library, send a pull request 
 
  - More Tests
  - Better Documentation
- - SQL Filter callback
