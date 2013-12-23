@@ -2,7 +2,9 @@
 
 namespace Samvaughton\Ldt;
 
-use Samvaughton\Ldt\Column\FilterProcessorInterface;
+use Samvaughton\Ldt\Builder\BuilderInterface;
+use Samvaughton\Ldt\Column\FilterQueryProcessorInterface;
+use Samvaughton\Ldt\Column\FilterTermProcessorInterface;
 use Samvaughton\Ldt\Column\RowProcessorInterface;
 
 class Column
@@ -80,12 +82,12 @@ class Column
      * @param string $term
      * @return string
      */
-    public function callFilterProcessor($term)
+    public function callFilterTermProcessor($term)
     {
-        if ($this->canCallFilterProcessor()) {
-            $callback = $this->options['filterProcessor'];
+        if ($this->canCallFilterTermProcessor()) {
+            $callback = $this->options['filterTermProcessor'];
 
-            if ($callback instanceof FilterProcessorInterface) {
+            if ($callback instanceof FilterTermProcessorInterface) {
                 return $callback->run($term);
             }
 
@@ -102,9 +104,41 @@ class Column
      *
      * @return bool
      */
-    public function canCallFilterProcessor()
+    public function canCallFilterTermProcessor()
     {
-        return $this->options['filterProcessor'] !== false;
+        return $this->options['filterTermProcessor'] !== false;
+    }
+
+    /**
+     * @param BuilderInterface $builder
+     * @param string $term
+     * @return mixed|false
+     */
+    public function callFilterQueryProcessor($builder, $term)
+    {
+        if ($this->canCallFilterQueryProcessor()) {
+            $callback = $this->options['filterQueryProcessor'];
+
+            if ($callback instanceof FilterQueryProcessorInterface) {
+                return $callback->run($builder, $this, $term);
+            }
+
+            if (is_callable($callback)) {
+                return $callback($builder, $this, $term);
+            }
+        }
+
+        return false; // No callback or class was called.
+    }
+
+    /**
+     * Returns whether this column has a callback or not.
+     *
+     * @return bool
+     */
+    public function canCallFilterQueryProcessor()
+    {
+        return $this->options['filterQueryProcessor'] !== false;
     }
 
     /**
@@ -227,7 +261,8 @@ class Column
             'sortable' => true,
             'searchable' => false,
             'rowProcessor' => false,
-            'filterProcessor' => false
+            'filterTermProcessor' => false,
+            'filterQueryProcessor' => false
         ), $options);
     }
 

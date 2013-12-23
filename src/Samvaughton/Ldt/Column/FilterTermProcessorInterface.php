@@ -2,7 +2,7 @@
 
 namespace Samvaughton\Ldt\Column;
 
-interface FilterProcessorInterface
+interface FilterTermProcessorInterface
 {
 
     /**
