@@ -141,7 +141,7 @@ class DataTable
                     continue;
                 }
 
-                $filteredRow[$column] = $displayColumn->process($value, $filteredRow, $rowData);
+                $filteredRow[$column] = $displayColumn->callRowProcessor($value, $filteredRow, $rowData);
             }
 
             $filtered[] = $this->stripColumnKeys($filteredRow);
