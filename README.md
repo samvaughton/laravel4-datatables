@@ -97,12 +97,12 @@ like the example above.
 'sortable'        => true
 'searchable'      => false
 'rowProcessor'    => false
-'filterProcessor' => false
+'filterTermProcessor' => false
 ```
  - `type` can be `TYPE_DYNAMIC` or `TYPE_STATIC`.
  - `sortable` and `searchable` are booleans (true/false).
  - `rowProcessor` is a callback / class that implements the `RowProcessorInterface`.
- - `filterProcessor` is a callback / class that implements the `FilterProcessorInterface`.
+ - `filterTermProcessor` is a callback / class that implements the `FilterTermProcessorInterface`.
 
 #### Processor's
 
@@ -141,7 +141,7 @@ Instead of passing a callback, you can also pass a class that implements the `Ro
 
 namespace \Samvaughton\Ldt;
 
-class ExampleColumnProcessor implements ColumnProcessorInterface
+class ExampleColumnProcessor implements RowProcessorInterface
 {
 
     /**
@@ -164,20 +164,24 @@ new Column('date', array(
 )
 ```
 
-The `filterProcessor` option is similar to the `rowProcessor` except that it modifies the search term before the query
+The `filterTermProcessor` option is similar to the `rowProcessor` except that it modifies the search term before the query
 is executed to fetch the results. Say you only wanted users to search in lowercase you could provide a callback/class
 that performs this.
 
 ```php
 new Column('name', array(
-    'filterProcessor' => function($term) {
+    'filterTermProcessor' => function($term) {
         return strtolower(trim($term));
     }
 )
 ```
 
-## Todo
+## Contributing
 
-- Write tests
-- Improve documentation
-- Add custom filtering callbacks/class
+I would love for people to help contribute to this library, send a pull request and I'll check it out!
+
+## Todo:
+
+ - More Tests
+ - Better Documentation
+ - SQL Filter callback

@@ -123,7 +123,8 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                             /** @var \Mockery\Mock $mock */
                             $mock->shouldReceive('isSearchable')->once()->andReturn(true);
                             $mock->shouldReceive('getSqlColumn')->once()->andReturn("test");
-                            $mock->shouldReceive('canCallFilterProcessor')->once();
+                            $mock->shouldReceive('canCallFilterTermProcessor')->once();
+                            $mock->shouldReceive('canCallFilterQueryProcessor')->once();
                         }),
                     'term'  => "search",
                     'searchable'  => true,
@@ -133,7 +134,8 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                             /** @var \Mockery\Mock $mock */
                             $mock->shouldReceive('isSearchable')->once()->andReturn(true);
                             $mock->shouldReceive('getSqlColumn')->once()->andReturn("test");
-                            $mock->shouldReceive('canCallFilterProcessor')->once();
+                            $mock->shouldReceive('canCallFilterTermProcessor')->once();
+                            $mock->shouldReceive('canCallFilterQueryProcessor')->once();
                         }),
                     'term'  => "search",
                     'searchable'  => true,
@@ -143,7 +145,8 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                             /** @var \Mockery\Mock $mock */
                             $mock->shouldReceive('isSearchable')->once()->andReturn(false);
                             $mock->shouldReceive('getSqlColumn')->never();
-                            $mock->shouldReceive('canCallFilterProcessor')->never();
+                            $mock->shouldReceive('canCallFilterTermProcessor')->never();
+                            $mock->shouldReceive('canCallFilterQueryProcessor')->never();
                         }),
                     'term'  => "search",
                     'searchable'  => true,
@@ -153,7 +156,8 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                             /** @var \Mockery\Mock $mock */
                             $mock->shouldReceive('isSearchable')->once()->andReturn(true);
                             $mock->shouldReceive('getSqlColumn')->never();
-                            $mock->shouldReceive('canCallFilterProcessor')->never();
+                            $mock->shouldReceive('canCallFilterTermProcessor')->never();
+                            $mock->shouldReceive('canCallFilterQueryProcessor')->never();
                         }),
                     'term'  => "search",
                     'searchable'  => false,

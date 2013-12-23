@@ -2,20 +2,24 @@
 
 namespace Samvaughton\Ldt\Builder;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Builder;
+
 class LaravelBuilder implements BuilderInterface
 {
 
     /**
-     * @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder;
+     * @var Builder|\Illuminate\Database\Eloquent\Builder;
      */
     private $query;
 
     /**
-     * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder; $query
+     * @param Builder|\Illuminate\Database\Eloquent\Builder $query
+     * @throws \InvalidArgumentException
      */
     public function __construct($query)
     {
-        if (!$query instanceof \Illuminate\Database\Query\Builder &&
+        if (!$query instanceof Builder &&
             !$query instanceof \Illuminate\Database\Eloquent\Builder)
         {
             throw new \InvalidArgumentException("The query must either be an instance of fluent or eloquent.");
@@ -77,7 +81,7 @@ class LaravelBuilder implements BuilderInterface
     public function filter(array $filterData)
     {
         $this->query->where(function ($query) use ($filterData) {
-            /** @var \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder $query */
+            /** @var Builder|\Illuminate\Database\Eloquent\Builder $query */
             foreach($filterData['columns'] as $colData) {
                 /** @var \Samvaughton\Ldt\Column $column */
                 $column = $colData['column'];
@@ -89,12 +93,17 @@ class LaravelBuilder implements BuilderInterface
                 $term = (empty($colData['term'])) ? $filterData['term'] : $colData['term'];
 
                 // Check if we have a callback, if so lets use it
-                if ($column->canCallFilterProcessor()) {
-                    $term = $column->callFilterProcessor($term);
+                if ($column->canCallFilterTermProcessor()) {
+                    $term = $column->canCallFilterTermProcessor($term);
                 }
 
                 // Actually apply the filter
-                $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
+                if ($column->canCallFilterQueryProcessor()) {
+                    $column->callFilterQueryProcessor($this, $term);
+                } else {
+                    // Standard query for filtering
+                    $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
+                }
             }
         });
     }
@@ -108,7 +117,7 @@ class LaravelBuilder implements BuilderInterface
     {
         $results = $this->query->get();
 
-        if ($results instanceof \Illuminate\Database\Eloquent\Collection) {
+        if ($results instanceof Collection) {
             $results = $this->convertEloquentToArray($results);
         }
 
@@ -118,7 +127,7 @@ class LaravelBuilder implements BuilderInterface
     /**
      * Converts the eloquent collection into an array -> stdClass data structure.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $results
+     * @param Collection $results
      * @return array
      */
     public function convertEloquentToArray($results)
@@ -132,7 +141,7 @@ class LaravelBuilder implements BuilderInterface
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Eloquent\Builder|Builder
      */
     public function getQuery()
     {

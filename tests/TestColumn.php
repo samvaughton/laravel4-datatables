@@ -1,7 +1,8 @@
 <?php
 
 use Samvaughton\Ldt\Column;
-use Samvaughton\Ldt\Column\ExampleFilterProcessor;
+use Samvaughton\Ldt\Column\ExampleFilterQueryProcessor;
+use Samvaughton\Ldt\Column\ExampleFilterTermProcessor;
 use Samvaughton\Ldt\Column\ExampleRowProcessor;
 
 class TestColumn extends PHPUnit_Framework_TestCase
@@ -83,30 +84,56 @@ class TestColumn extends PHPUnit_Framework_TestCase
         ));
     }
 
-    public function testFilterProcessorClosure()
+    public function testFilterTermProcessorClosure()
     {
         $col = new Column("name", array(
-            'filterProcessor' => function($term) {
+            'filterTermProcessor' => function($term) {
                  return strtolower(trim($term));
             }
         ));
 
-        $this->assertTrue($col->canCallFilterProcessor());
+        $this->assertTrue($col->canCallFilterTermProcessor());
 
-        $this->assertEquals("test", $col->callFilterProcessor(" TEST "));
+        $this->assertEquals("test", $col->callFilterTermProcessor(" TEST "));
     }
 
-    public function testFilterProcessorInterface()
+    public function testFilterTermProcessorInterface()
     {
         $col = new Column("name", array(
-            'filterProcessor' => new ExampleFilterProcessor()
+            'filterTermProcessor' => new ExampleFilterTermProcessor()
         ));
 
-        $this->assertTrue($col->canCallFilterProcessor());
+        $this->assertTrue($col->canCallFilterTermProcessor());
 
-        $this->assertEquals("test", $col->callFilterProcessor(" TEST "));
+        $this->assertEquals("test", $col->callFilterTermProcessor(" TEST "));
     }
 
+    public function testFilterQueryProcessorClosure()
+    {
+        $col = new Column("name", array(
+            'filterQueryProcessor' => function($builder, $column, $term) {
+                return strtolower(trim($term));
+            }
+        ));
 
+        $this->assertTrue($col->canCallFilterQueryProcessor());
+
+        $this->assertEquals("test", $col->callFilterQueryProcessor(
+            \Mockery::mock('FilterQueryProcessorInterface'), " TEST "
+        ));
+    }
+
+    public function testFilterQueryProcessorInterface()
+    {
+        $col = new Column("name", array(
+            'filterQueryProcessor' => new ExampleFilterQueryProcessor()
+        ));
+
+        $this->assertTrue($col->canCallFilterQueryProcessor());
+
+        $this->assertEquals("test", $col->callFilterQueryProcessor(
+            \Mockery::mock('FilterQueryProcessorInterface'), " TEST "
+        ));
+    }
 
 }
