@@ -44,10 +44,10 @@ class Column
      * @param $originalRow
      * @return mixed
      */
-    public function process($currentValue, $row, $originalRow)
+    public function callRowProcessor($currentValue, $row, $originalRow)
     {
-        if ($this->canProcess()) {
-            $callback = $this->options['processor'];
+        if ($this->canCallRowProcessor()) {
+            $callback = $this->options['rowProcessor'];
 
             if ($callback instanceof ColumnProcessorInterface) {
                 return $callback->run($currentValue, $row, $originalRow);
@@ -66,9 +66,9 @@ class Column
      *
      * @return bool
      */
-    public function canProcess()
+    public function canCallRowProcessor()
     {
-        return $this->options['processor'] !== false;
+        return $this->options['rowProcessor'] !== false;
     }
 
     /**
@@ -115,7 +115,7 @@ class Column
      */
     public function isSearchable()
     {
-        return $this->options['searchable'] && $this->isDynamic();
+        return ($this->options['searchable'] !== false) && $this->isDynamic();
     }
 
     /**
@@ -190,7 +190,7 @@ class Column
             'type' => self::TYPE_DYNAMIC,
             'sortable' => true,
             'searchable' => false,
-            'processor' => false
+            'rowProcessor' => false
         ), $options);
     }
 
