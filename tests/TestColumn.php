@@ -15,7 +15,7 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $this->assertEquals(true, $col->isDynamic());
         $this->assertEquals(false, $col->isStatic());
         $this->assertEquals(false, $col->isSearchable());
-        $this->assertEquals(false, $col->canProcess());
+        $this->assertEquals(false, $col->canCallRowProcessor());
     }
 
     public function testCustomOptions()
@@ -30,7 +30,7 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $this->assertEquals(false, $col->isDynamic());
         $this->assertEquals(true, $col->isStatic());
         $this->assertEquals(false, $col->isSearchable()); // Static column, cant be searched
-        $this->assertEquals(false, $col->canProcess());
+        $this->assertEquals(false, $col->canCallRowProcessor());
     }
 
     public function testSqlColumn()
@@ -54,7 +54,7 @@ class TestColumn extends PHPUnit_Framework_TestCase
     {
         $self = $this;
         $col = new Column("name", array(
-            'processor' => function($value, $row, $originalRow) use ($self) {
+            'rowProcessor' => function($value, $row, $originalRow) use ($self) {
                 $self->assertEquals('test', $value);
                 $self->assertEquals('test', $row['name']);
                 $self->assertEquals('test', $originalRow['name']);
@@ -62,9 +62,9 @@ class TestColumn extends PHPUnit_Framework_TestCase
             }
         ));
 
-        $this->assertTrue($col->canProcess());
+        $this->assertTrue($col->canCallRowProcessor());
 
-        $this->assertEquals("~test", $col->process(
+        $this->assertEquals("~test", $col->callRowProcessor(
             'test', array('name' => 'test'), array('name' => 'test')
         ));
     }
@@ -72,12 +72,12 @@ class TestColumn extends PHPUnit_Framework_TestCase
     public function testClassProcessor()
     {
         $col = new Column("name", array(
-            'processor' => new ExampleColumnProcessor()
+            'rowProcessor' => new ExampleColumnProcessor()
         ));
 
-        $this->assertTrue($col->canProcess());
+        $this->assertTrue($col->canCallRowProcessor());
 
-        $this->assertEquals("test - 1", $col->process(
+        $this->assertEquals("test - 1", $col->callRowProcessor(
             'test', array('name' => 'test'), array('name' => 'test')
         ));
     }

@@ -31,11 +31,11 @@ $dth = new DataTable(
         new Column('email', array('searchable' => true)),
         new Column('phone'),
         new Column('date_registered', array(
-            'processor' => new \DateColumnProcessor()
+            'rowProcessor' => new \DateColumnProcessor()
         )),
         new Column('actions', array(
             'type' => Column::TYPE_STATIC,
-            'processor' => function($value, $row, $originalRow) {
+            'rowProcessor' => function($value, $row, $originalRow) {
                 return sprintf(
                     '<a href="/customer/edit/%s">Edit</a>',
                     $row['id']
@@ -96,21 +96,21 @@ like the example above.
 'type'       => self::TYPE_DYNAMIC
 'sortable'   => true
 'searchable' => false
-'processor'  => false
+'rowProcessor'  => false
 ```
  - `type` can be `TYPE_DYNAMIC` or `TYPE_STATIC`.
  - `sortable` and `searchable` are booleans (true/false).
- - `processor` is a callback / class that implements the `ColumnProcessorInterface`.
+ - `rowProcessor` is a callback / class that implements the `ColumnProcessorInterface`.
 
 #### Processor
 
-The processor options allows you to run a function against each column's data, this is for scenarios where you need to
+The `rowProcessor` options allows you to run a function against each column's data, this is for scenarios where you need to
 append some action buttons or convert a unix timestamp to a more readable date.
 
 ```php
 new Column('actions', array(
     'type' => Column::TYPE_STATIC,
-    'processor' => function($value, $row, $originalRow) {
+    'rowProcessor' => function($value, $row, $originalRow) {
         return sprintf(
             '<a href="/customer/edit/%s">Edit</a>',
             $row['id']
@@ -158,7 +158,7 @@ The column instantiation may look something like this:
 ```php
 new Column('date', array(
     'type' => Column::TYPE_STATIC,
-    'processor' => new \Samvaughton\Ldt\ExampleColumnProcessor
+    'rowProcessor' => new \Samvaughton\Ldt\ExampleColumnProcessor
 )
 ```
 
