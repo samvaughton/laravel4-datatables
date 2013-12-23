@@ -119,7 +119,7 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $this->assertTrue($col->canCallFilterQueryProcessor());
 
         $this->assertEquals("test", $col->callFilterQueryProcessor(
-            \Mockery::mock('FilterQueryProcessorInterface'), " TEST "
+            \Mockery::mock('BuilderInterface'), " TEST "
         ));
     }
 
@@ -131,8 +131,12 @@ class TestColumn extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($col->canCallFilterQueryProcessor());
 
-        $this->assertEquals("test", $col->callFilterQueryProcessor(
-            \Mockery::mock('FilterQueryProcessorInterface'), " TEST "
+        $this->assertTrue($col->callFilterQueryProcessor(
+            \Mockery::mock('BuilderInterface', function($mock) {
+                /** @var \Mockery\Mock $mock */
+                $mock->shouldReceive('getQuery->where')->once();
+            }),
+            " TEST "
         ));
     }
 

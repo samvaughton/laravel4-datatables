@@ -17,6 +17,8 @@ class ExampleFilterQueryProcessor implements FilterQueryProcessorInterface
     public function run($builder, $column, $term)
     {
         $builder->getQuery()->where($column->getSqlColumn(), '=', trim($term));
+
+        return true;
     }
 
 
