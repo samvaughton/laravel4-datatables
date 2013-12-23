@@ -94,7 +94,7 @@ class LaravelBuilder implements BuilderInterface
 
                 // Check if we have a callback, if so lets use it
                 if ($column->canCallFilterTermProcessor()) {
-                    $term = $column->canCallFilterTermProcessor($term);
+                    $term = $column->callFilterTermProcessor($term);
                 }
 
                 // Actually apply the filter
