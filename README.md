@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/samvaughton/laravel4-datatables.png?branch=master)](https://travis-ci.org/samvaughton/laravel4-datatables)
 
-This library aims to be different than existing DataTable packages, taking a different approach that allows greater flexibility.
+This library is for the server side processing of the client requests. It aims to be different than existing DataTable
+packages, taking a different approach that allows greater flexibility.
 
 ## Composer
 
