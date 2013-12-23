@@ -2,6 +2,9 @@
 
 namespace Samvaughton\Ldt;
 
+use Samvaughton\Ldt\Column\FilterProcessorInterface;
+use Samvaughton\Ldt\Column\RowProcessorInterface;
+
 class Column
 {
 
@@ -49,7 +52,7 @@ class Column
         if ($this->canCallRowProcessor()) {
             $callback = $this->options['rowProcessor'];
 
-            if ($callback instanceof ColumnProcessorInterface) {
+            if ($callback instanceof RowProcessorInterface) {
                 return $callback->run($currentValue, $row, $originalRow);
             }
 
@@ -69,6 +72,39 @@ class Column
     public function canCallRowProcessor()
     {
         return $this->options['rowProcessor'] !== false;
+    }
+
+    /**
+     * Processes the filter term before searching with it such as making it all lowercase.
+     *
+     * @param string $term
+     * @return string
+     */
+    public function callFilterProcessor($term)
+    {
+        if ($this->canCallFilterProcessor()) {
+            $callback = $this->options['filterProcessor'];
+
+            if ($callback instanceof FilterProcessorInterface) {
+                return $callback->run($term);
+            }
+
+            if (is_callable($callback)) {
+                return $callback($term);
+            }
+        }
+
+        return $term;
+    }
+
+    /**
+     * Returns whether this column has a callback or not.
+     *
+     * @return bool
+     */
+    public function canCallFilterProcessor()
+    {
+        return $this->options['filterProcessor'] !== false;
     }
 
     /**
@@ -115,7 +151,7 @@ class Column
      */
     public function isSearchable()
     {
-        return ($this->options['searchable'] !== false) && $this->isDynamic();
+        return $this->options['searchable'] && $this->isDynamic();
     }
 
     /**
@@ -190,7 +226,8 @@ class Column
             'type' => self::TYPE_DYNAMIC,
             'sortable' => true,
             'searchable' => false,
-            'rowProcessor' => false
+            'rowProcessor' => false,
+            'filterProcessor' => false
         ), $options);
     }
 

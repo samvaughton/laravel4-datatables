@@ -1,7 +1,8 @@
 <?php
 
 use Samvaughton\Ldt\Column;
-use Samvaughton\Ldt\ExampleColumnProcessor;
+use Samvaughton\Ldt\Column\ExampleFilterProcessor;
+use Samvaughton\Ldt\Column\ExampleRowProcessor;
 
 class TestColumn extends PHPUnit_Framework_TestCase
 {
@@ -50,7 +51,7 @@ class TestColumn extends PHPUnit_Framework_TestCase
         $this->assertEquals("name", (string) $col);
     }
 
-    public function testFunctionCallback()
+    public function testRowProcessorClosure()
     {
         $self = $this;
         $col = new Column("name", array(
@@ -69,10 +70,10 @@ class TestColumn extends PHPUnit_Framework_TestCase
         ));
     }
 
-    public function testClassProcessor()
+    public function testRowProcessorInterface()
     {
         $col = new Column("name", array(
-            'rowProcessor' => new ExampleColumnProcessor()
+            'rowProcessor' => new ExampleRowProcessor()
         ));
 
         $this->assertTrue($col->canCallRowProcessor());
@@ -81,5 +82,31 @@ class TestColumn extends PHPUnit_Framework_TestCase
             'test', array('name' => 'test'), array('name' => 'test')
         ));
     }
+
+    public function testFilterProcessorClosure()
+    {
+        $col = new Column("name", array(
+            'filterProcessor' => function($term) {
+                 return strtolower(trim($term));
+            }
+        ));
+
+        $this->assertTrue($col->canCallFilterProcessor());
+
+        $this->assertEquals("test", $col->callFilterProcessor(" TEST "));
+    }
+
+    public function testFilterProcessorInterface()
+    {
+        $col = new Column("name", array(
+            'filterProcessor' => new ExampleFilterProcessor()
+        ));
+
+        $this->assertTrue($col->canCallFilterProcessor());
+
+        $this->assertEquals("test", $col->callFilterProcessor(" TEST "));
+    }
+
+
 
 }

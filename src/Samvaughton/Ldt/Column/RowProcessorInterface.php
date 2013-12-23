@@ -1,8 +1,8 @@
 <?php
 
-namespace Samvaughton\Ldt;
+namespace Samvaughton\Ldt\Column;
 
-interface ColumnProcessorInterface
+interface RowProcessorInterface
 {
 
     /**
