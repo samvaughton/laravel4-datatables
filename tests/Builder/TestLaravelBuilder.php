@@ -109,6 +109,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                     /** @var \Mockery\Mock $mock */
                     $mock->makePartial();
                     $mock->shouldReceive('orWhere')->twice();
+                    $mock->shouldReceive('raw')->twice();
                 })
             );
         });
