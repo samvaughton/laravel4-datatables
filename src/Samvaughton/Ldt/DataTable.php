@@ -101,17 +101,17 @@ class DataTable
         );
 
         /**
-         * Apply Ordering
-         */
-        $this->builder->order($this->parseSortableColumns());
-
-        /**
          * Apply Filtering
          */
         if ($this->request->isFilterable()) {
             $this->builder->filter($this->parseFilterableColumns());
             $this->filteredRecords = $this->builder->count();
         }
+
+        /**
+         * Apply Ordering
+         */
+        $this->builder->order($this->parseSortableColumns());
 
         return $this->builder->get();
     }
