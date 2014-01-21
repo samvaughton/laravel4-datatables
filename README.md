@@ -45,6 +45,9 @@ $dth = new DataTable(
 
 return $dth->make();
 ```
+
+*I have imported the neccassary namespace paths via `use` for `DataTable`, `LaravelBuilder` and `Request`.*
+
 Quite a lot is going on here, but it is very readable. The `DataTable` class accepts three parameters. A class that
 implements `BuilderInterface` (there is one already built for Laravel), a `Request` class which handles the parsing of
 the client side request and thirdly an array of columns which are visible to the user.
