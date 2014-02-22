@@ -25,7 +25,7 @@ $dth = new DataTable(
     new Request(\Input::all()),
     array(
         new Column('id'),
-        new Column('name'), array('searchable' => true)),
+        new Column('name', array('searchable' => true)),
         new Column('email', array('searchable' => true)),
         new Column('phone'),
         new Column('date_registered', array(
