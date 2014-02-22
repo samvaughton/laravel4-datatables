@@ -65,7 +65,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                 'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
                         /** @var \Mockery\Mock $mock */
                         $mock->shouldReceive('isSortable')->once()->andReturn(true);
-                        $mock->shouldReceive('getSqlColumn')->once();
+                        $mock->shouldReceive('getName')->once();
                     }),
                 'direction' => 'asc',
                 'sortable'  => true,
@@ -74,7 +74,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                 'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
                         /** @var \Mockery\Mock $mock */
                         $mock->shouldReceive('isSortable')->once()->andReturn(true);
-                        $mock->shouldReceive('getSqlColumn')->once();
+                        $mock->shouldReceive('getName')->once();
                     }),
                 'direction' => 'desc',
                 'sortable'  => true,
