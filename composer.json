@@ -1,10 +1,15 @@
 {
     "name": "samvaughton/ldt",
     "description": "Laravel 4 DataTables library to handle the server-side calls.",
+    "license": "MIT",
+    "keywords": ["Laravel", "DataTables", "tables", "data"],
+    "homepage": "https://github.com/samvaughton/laravel4-datatables",
     "authors": [
         {
             "name": "Sam Vaughton",
-            "email": "samvaughton@gmail.com"
+            "email": "samvaughton@gmail.com",
+            "homepage": "http://samvaughton.com",
+            "role": "Developer"
         }
     ],
     "require": {
