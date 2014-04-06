@@ -9,7 +9,7 @@ packages, taking a different approach that allows greater flexibility.
 
 ```json
 "require": {
-    "samvaughton/ldt": "dev-master"
+    "samvaughton/ldt": "0.1.*"
 }
 ```
 
