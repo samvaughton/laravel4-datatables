@@ -161,7 +161,7 @@ class DataTable
     private function stripInvalidChars($string)
     {
         if (is_null($string) || empty($string) || $string == false) {
-            return;
+            return $string;
         }
 
         // Reject overly long 2 byte sequences, as well as characters above U+10000 and replace with ''
