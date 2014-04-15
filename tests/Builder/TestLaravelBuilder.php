@@ -108,7 +108,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                 \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
                     /** @var \Mockery\Mock $mock */
                     $mock->makePartial();
-                    $mock->shouldReceive('orWhere')->times(3);
+                    $mock->shouldReceive('orWhere')->times(2);
                 })
             );
         });
@@ -154,13 +154,13 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                 array(
                     'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
                             /** @var \Mockery\Mock $mock */
-                            $mock->shouldReceive('isSearchable')->once()->andReturn(true);
+                            $mock->shouldReceive('isSearchable')->once()->andReturn(false);
                             $mock->shouldReceive('getSqlColumn')->never();
                             $mock->shouldReceive('canCallFilterTermProcessor')->never();
                             $mock->shouldReceive('canCallFilterQueryProcessor')->never();
                         }),
                     'term'  => "search",
-                    'searchable'  => true,
+                    'searchable'  => false,
                 ),
             )
         ));
