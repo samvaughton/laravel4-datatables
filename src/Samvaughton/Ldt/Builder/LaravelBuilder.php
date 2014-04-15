@@ -36,6 +36,7 @@ class LaravelBuilder implements BuilderInterface
     public function count()
     {
         $dupe = clone $this->query; // Clone so we don't reset the original queries select.
+
         return (int) $dupe->count();
     }
 
@@ -86,8 +87,12 @@ class LaravelBuilder implements BuilderInterface
                 /** @var \Samvaughton\Ldt\Column $column */
                 $column = $colData['column'];
 
+                if (!$column instanceof \Samvaughton\Ldt\Column) {
+                    continue; // Not a column
+                }
+
                 // See if this column is searchable
-                if (!$column->isSearchable() || !$colData['searchable']) continue;
+                if (!$column->isSearchable()) continue;
 
                 // If the individual column term is empty, use the main term
                 $term = (empty($colData['term'])) ? $filterData['term'] : $colData['term'];
@@ -102,7 +107,9 @@ class LaravelBuilder implements BuilderInterface
                     $column->callFilterQueryProcessor($this, $term);
                 } else {
                     // Standard query for filtering
-                    $query->orWhere($query->raw($column->getSqlColumn()), "LIKE", "%{$term}%");
+                    $raw = $query->raw($column->getSqlColumn());
+
+                    $query->orWhere($raw, "LIKE", "%{$term}%");
                 }
             }
         });

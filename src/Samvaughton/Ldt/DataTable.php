@@ -214,9 +214,13 @@ class DataTable
         /**
          * Convert the column number to an actual column instance.
          */
-        array_walk($filterableColumns['columns'], function(&$data) {
-            $data['column'] = $this->columns[$data['column']];
-        });
+        if (is_array($filterableColumns)) {
+            array_walk($filterableColumns['columns'], function(&$data) {
+                if (isset($this->columns[$data['column']])) {
+                    $data['column'] = $this->columns[$data['column']];
+                }
+            });
+        }
 
         return $filterableColumns;
     }
