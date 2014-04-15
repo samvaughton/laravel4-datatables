@@ -99,17 +99,15 @@ class LaravelBuilder implements BuilderInterface
 
                 // Check if we have a callback, if so lets use it
                 if ($column->canCallFilterTermProcessor()) {
-                    $term = $column->callFilterTermProcessor($term);
+                    //$term = $column->callFilterTermProcessor($term);
                 }
 
                 // Actually apply the filter
                 if ($column->canCallFilterQueryProcessor()) {
-                    $column->callFilterQueryProcessor($this, $term);
+                    //$column->callFilterQueryProcessor($this, $term);
                 } else {
                     // Standard query for filtering
-                    $raw = $query->raw($column->getSqlColumn());
-
-                    $query->orWhere($raw, "LIKE", "%{$term}%");
+                    $query->orWhere($column->getSqlColumn(), "LIKE", "%{$term}%");
                 }
             }
         });
