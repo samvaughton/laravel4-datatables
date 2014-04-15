@@ -108,8 +108,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                 \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
                     /** @var \Mockery\Mock $mock */
                     $mock->makePartial();
-                    $mock->shouldReceive('orWhere')->twice();
-                    $mock->shouldReceive('raw')->twice();
+                    $mock->shouldReceive('orWhere')->times(3);
                 })
             );
         });
@@ -150,7 +149,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                             $mock->shouldReceive('canCallFilterQueryProcessor')->never();
                         }),
                     'term'  => "search",
-                    'searchable'  => true,
+                    'searchable'  => false,
                 ),
                 array(
                     'column'    => \Mockery::mock('\Samvaughton\Ldt\Column', function ($mock) {
@@ -161,7 +160,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                             $mock->shouldReceive('canCallFilterQueryProcessor')->never();
                         }),
                     'term'  => "search",
-                    'searchable'  => false,
+                    'searchable'  => true,
                 ),
             )
         ));
