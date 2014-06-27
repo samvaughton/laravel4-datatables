@@ -107,7 +107,7 @@ class LaravelBuilder implements BuilderInterface
                     //$column->callFilterQueryProcessor($this, $term);
                 } else {
                     // Standard query for filtering
-                    $query->orWhere($query->raw($column->getSqlColumn()), "LIKE", "\"%{$term}%\"");
+                    $query->orWhereRaw(sprintf("%s LIKE \"%s\"", $column->getSqlColumn(), "%".$term."%"));
                 }
             }
         });

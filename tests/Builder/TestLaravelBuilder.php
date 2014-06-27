@@ -108,8 +108,7 @@ class TestLaravelBuilder extends PHPUnit_Framework_TestCase
                 \Mockery::mock('Illuminate\Database\Query\Builder', function ($mock) {
                     /** @var \Mockery\Mock $mock */
                     $mock->makePartial();
-                    $mock->shouldReceive('orWhere')->times(2);
-                    $mock->shouldReceive('raw')->times(2);
+                    $mock->shouldReceive('orWhereRaw')->times(2);
                 })
             );
         });
